@@ -1,7 +1,14 @@
-print("ola como vai")
-print("ola")
-print("ola")
 
-print("olaaaaaaaaaaaaaaaaaaaaa")
+while True:
+    try:
+        nome=input("insira o seu nome: ")
+        break
+    except ValueError:
+        print("Entrada inválida! Por favor, insira o seu nome.")
+while True:
+    email = input("Insira o seu email: ")
 
-print("oo")
+    if email.count("@")!=1:
+        print("Invalido,Tente Novamente")
+        continue
+        

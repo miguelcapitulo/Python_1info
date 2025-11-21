@@ -1,6 +1,1 @@
-print("Oooo")
-print("ola")
-print("Funcionou")
-print("olaggagagagag")
-print("ollllllllllllllllllllllllla")
-print("oidfgdfgdfg")
+x=int(input("insira o nome"))
