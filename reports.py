@@ -7,5 +7,29 @@ while True:
     
     else:
         break
+    descriçao=input("Digite a descrição do projeto (deixe vazio para finalizar):")
+linhas = []
 while True:
-    descricao=input("Digite a descrição do projeto: ")
+    linha = input()
+    if linha.strip() == "":
+        break
+    linhas.append(linha)
+
+descricao = "\n".join(linhas)
+
+from datetime import datetime
+
+def ler_data(mensagem):
+    while True:
+        data_str = input(mensagem)
+        try:
+            data = datetime.strptime(data_str, "%d/%m/%Y")
+            return data
+        except ValueError:
+            print("Data inválida! Use o formato DD/MM/AAAA.\n")
+
+data_inicio = ler_data("Digite a data de início (DD/MM/AAAA): ")
+data_fim = ler_data("Digite a data de fim (DD/MM/AAAA): ")
+
+print("Data de início:", data_inicio)
+print("Data de fim:   ", data_fim)
