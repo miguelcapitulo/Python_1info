@@ -1,16 +1,23 @@
 [
     {
-        "titulo": "trabalho",
+        "titulo": "pytthon",
         "projeto": "python",
         "responsavel": "Miguel",
-        "status": "andamento",
-        "prazo": "27/10/2027"
+        "status": "pendente",
+        "prazo": "27/10/2022"
     },
     {
-        "titulo": "projeto final",
-        "projeto": "teste",
-        "responsavel": "joao",
+        "titulo": "c+",
+        "projeto": "func_exp",
+        "responsavel": "Miguel",
+        "status": "andamento",
+        "prazo": "08/06/2010"
+    },
+    {
+        "titulo": "burnet",
+        "projeto": "burnout",
+        "responsavel": "Migueol",
         "status": "pendente",
-        "prazo": "24/12/2030"
+        "prazo": "27/10/2022"
     }
 ]
