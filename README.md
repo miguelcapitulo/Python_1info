@@ -1,1 +1,1 @@
-João Burnett, Miguel Bicudo e Miguel Capítulo
+João Burnett, Miguel Araujo, Miguel Capítulo
