@@ -26,5 +26,12 @@
         "responsavel": "Burnett",
         "status": "andamento",
         "prazo": "24/08/2026"
+    },
+    {
+        "titulo": "chuto",
+        "projeto": "Projeto final",
+        "responsavel": "Burnett",
+        "status": "concluída",
+        "prazo": "24/08/2028"
     }
 ]

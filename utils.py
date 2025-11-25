@@ -4,14 +4,13 @@ VALID_STATUS = ("pendente", "andamento", "concluída")
 
 def pedir_data(msg):
     while True:
-        s = input(msg).strip()
-        if s == "":
-            return ""
+        s = input(f"{msg} ").strip()
         try:
             datetime.strptime(s, "%d/%m/%Y")
             return s
         except ValueError:
-            print("Formato inválido. Use DD/MM/AAAA")
+            print("Formato inválido! Digite no formato DD/MM/AAAA.")
+
 
 def validar_status(s):
-    return s and s.lower() in VALID_STATUS
+    return s.lower().strip() in VALID_STATUS if s else False
