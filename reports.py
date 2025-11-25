@@ -1,34 +1,56 @@
-# reports.py
-from services import listar_tarefas, listar_projetos, listar_usuarios
+from services import listar_projetos, listar_tarefas
 from datetime import datetime
-from typing import Dict
 
-def resumo_geral() -> Dict[str,int]:
-    return {
-        "usuarios": len(listar_usuarios()),
-        "projetos": len(listar_projetos()),
-        "tarefas": len(listar_tarefas())
-    }
+def resumo_por_projeto():
+    projetos = listar_projetos()
+    tarefas = listar_tarefas()
+    if not projetos:
+        return {}
+    resumo = {}
+    for p in projetos:
+        nome = p.get("nome")
+        tproj = [t for t in tarefas if t.get("projeto","").lower() == nome.lower()]
+        total = len(tproj)
+        pend = sum(1 for t in tproj if t.get("status") == "pendente")
+        andam = sum(1 for t in tproj if t.get("status") == "andamento")
+        conc = sum(1 for t in tproj if t.get("status") == "concluída")
+        pct = round((conc / total * 100), 1) if total else 0.0
+        resumo[nome] = {"total_tarefas": total, "pendente": pend, "andamento": andam, "concluída": conc, "percentual_conclusão": pct}
+    return resumo
 
-def tarefas_por_status() -> Dict[str,int]:
-    from services import buscar_tarefas_por_status
-    d = {}
-    for s in ("pendente","andamento","concluída"):
-        d[s] = len(buscar_tarefas_por_status(s))
-    return d
+def produtividade_por_usuario(data_ini=None, data_fim=None):
+    tarefas = listar_tarefas()
+    res = {}
+    fmt = "%d/%m/%Y"
+    if data_ini:
+        di = datetime.strptime(data_ini, fmt)
+    else:
+        di = None
+    if data_fim:
+        df = datetime.strptime(data_fim, fmt)
+    else:
+        df = None
+    for t in tarefas:
+        if t.get("status") != "concluída":
+            continue
+        prazo = datetime.strptime(t.get("prazo"), fmt)
+        if di and prazo < di: continue
+        if df and prazo > df: continue
+        nome = t.get("responsavel")
+        res[nome] = res.get(nome, 0) + 1
+    return res
 
-def tarefas_vencidas_ate(data_str: str):
-    """Retorna tarefas com prazo <= data_str (DD/MM/YYYY)."""
-    try:
-        limite = datetime.strptime(data_str, "%d/%m/%Y")
-    except Exception:
-        return []
-    out = []
-    for t in listar_tarefas():
+def tarefas_atrasadas():
+    hoje = datetime.today()
+    tarefas = listar_tarefas()
+    atrasadas = []
+    for t in tarefas:
+        if t.get("status") == "concluída":
+            continue
         try:
-            p = datetime.strptime(t.get("prazo","01/01/1900"), "%d/%m/%Y")
-            if p <= limite:
-                out.append(t)
+            prazo = datetime.strptime(t.get("prazo"), "%d/%m/%Y")
+            if prazo < hoje:
+                atrasadas.append(t)
         except Exception:
             continue
-    return out
+    return atrasadas

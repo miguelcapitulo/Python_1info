@@ -1,165 +1,133 @@
-# services.py
 from storage import load_list, save_list
-from models import novo_usuario, novo_projeto, nova_tarefa
-from utils import validar_status, parse_date_str
-from typing import List, Dict
+from models import criar_usuario, criar_projeto, criar_tarefa
+from datetime import datetime
 
-USERS = "usuarios.json"
-PROJ = "projeto.json"
-TASKS = "tarefas.json"
+USERS_FILE = "usuarios.json"
+PROJECTS_FILE = "projeto.json"
+TASKS_FILE = "tarefas.json"
 
-# ---------- Usuários ----------
-def listar_usuarios() -> List[Dict]:
-    return load_list(USERS)
+#Usuários
+def listar_usuarios():
+    return load_list(USERS_FILE)
 
-def cadastrar_usuario(nome: str, email: str, perfil: str) -> None:
-    usuarios = load_list(USERS)
+def cadastrar_usuario(nome, email, perfil):
+    usuarios = listar_usuarios()
     if any(u.get("Email","").lower() == email.lower() for u in usuarios):
-        raise ValueError("E-mail já cadastrado.")
-    u = novo_usuario(nome, email, perfil)
+        raise ValueError("Email já cadastrado")
+    u = criar_usuario(nome, email, perfil)
     usuarios.append(u)
-    save_list(USERS, usuarios)
+    save_list(USERS_FILE, usuarios)
+    return u
 
-def buscar_usuarios(termo: str) -> List[Dict]:
-    t = termo.strip().lower()
-    return [u for u in load_list(USERS) if t in u.get("Nome","").lower() or t in u.get("Email","").lower()]
+def buscar_usuarios(term):
+    term = term.lower()
+    return [u for u in listar_usuarios() if term in u.get("Nome","").lower() or term in u.get("Email","").lower()]
 
-def atualizar_usuario(email_ref: str, campo: str, valor: str) -> bool:
-    usuarios = load_list(USERS)
-    updated = False
+def atualizar_usuario(email, campo, valor):
+    usuarios = listar_usuarios()
     for u in usuarios:
-        if u.get("Email","").lower() == email_ref.lower():
-            if campo == "Email" and any(x.get("Email","").lower() == valor.lower() for x in usuarios):
-                raise ValueError("Novo e-mail já cadastrado.")
+        if u.get("Email","").lower() == email.lower():
             u[campo] = valor
-            updated = True
-            break
-    if updated:
-        save_list(USERS, usuarios)
-    return updated
+            save_list(USERS_FILE, usuarios)
+            return True
+    return False
 
-def remover_usuario(email: str) -> bool:
-    usuarios = load_list(USERS)
-    novas = [u for u in usuarios if u.get("Email","").lower() != email.lower()]
-    if len(novas) == len(usuarios):
-        return False
-    save_list(USERS, novas)
-    return True
+def remover_usuario(email):
+    usuarios = listar_usuarios()
+    nova = [u for u in usuarios if u.get("Email","").lower() != email.lower()]
+    if len(nova) < len(usuarios):
+        save_list(USERS_FILE, nova)
+        return True
+    return False
 
-def remover_todos_usuarios() -> None:
-    save_list(USERS, [])
+def remover_todos_usuarios():
+    save_list(USERS_FILE, [])
 
-# ---------- Projetos ----------
-def listar_projetos() -> List[Dict]:
-    return load_list(PROJ)
+#Projetos
+def listar_projetos():
+    return load_list(PROJECTS_FILE)
 
-def cadastrar_projeto(nome: str, descricao: str, data_inicio: str, data_fim: str) -> None:
-    projetos = load_list(PROJ)
+def cadastrar_projeto(nome, descricao, ini, fim):
+    projetos = listar_projetos()
     if any(p.get("nome","").lower() == nome.lower() for p in projetos):
-        raise ValueError("Projeto com esse nome já existe.")
-    p = novo_projeto(nome, descricao, data_inicio, data_fim)
+        raise ValueError("Projeto já existe")
+    p = criar_projeto(nome, descricao, ini, fim)
     projetos.append(p)
-    save_list(PROJ, projetos)
+    save_list(PROJECTS_FILE, projetos)
+    return p
 
-def buscar_projeto(nome: str) -> List[Dict]:
-    n = nome.strip().lower()
-    return [p for p in load_list(PROJ) if n == p.get("nome","").lower()]
+def buscar_projeto(nome):
+    nome = nome.lower()
+    return [p for p in listar_projetos() if nome in p.get("nome","").lower()]
 
-def atualizar_projeto(nome_ref: str, campo: str, valor: str) -> bool:
-    projetos = load_list(PROJ)
-    updated = False
+def atualizar_projeto(nome, campo, valor):
+    projetos = listar_projetos()
     for p in projetos:
-        if p.get("nome","").lower() == nome_ref.lower():
-            if campo == "nome" and any(x.get("nome","").lower() == valor.lower() for x in projetos):
-                raise ValueError("Nome de projeto já existe.")
-            # if updating dates, validate
-            if campo in ("data_inicio","data_fim"):
-                if not parse_date_str(valor):
-                    raise ValueError("Data inválida. Use DD/MM/AAAA.")
+        if p.get("nome","").lower() == nome.lower():
             p[campo] = valor
-            updated = True
-            break
-    if updated:
-        save_list(PROJ, projetos)
-    return updated
+            save_list(PROJECTS_FILE, projetos)
+            return True
+    return False
 
-def remover_projeto(nome: str) -> bool:
-    projetos = load_list(PROJ)
-    novas = [p for p in projetos if p.get("nome","").lower() != nome.lower()]
-    if len(novas) == len(projetos):
-        return False
-    save_list(PROJ, novas)
-    return True
+def remover_projeto(nome):
+    projetos = listar_projetos()
+    nova = [p for p in projetos if p.get("nome","").lower() != nome.lower()]
+    if len(nova) < len(projetos):
+        save_list(PROJECTS_FILE, nova)
+        return True
+    return False
 
-def remover_todos_projetos() -> None:
-    save_list(PROJ, [])
+def remover_todos_projetos():
+    save_list(PROJECTS_FILE, [])
 
-# ---------- Tarefas ----------
-def listar_tarefas() -> List[Dict]:
-    return load_list(TASKS)
+#Tarefas
+def listar_tarefas():
+    return load_list(TASKS_FILE)
 
-def cadastrar_tarefa(titulo: str, projeto: str, responsavel: str, status: str, prazo: str) -> None:
-    projetos = load_list(PROJ)
-    usuarios = load_list(USERS)
+def cadastrar_tarefa(titulo, projeto, responsavel, status, prazo):
+    projetos = listar_projetos()
+    usuarios = listar_usuarios()
     if not any(p.get("nome","").lower() == projeto.lower() for p in projetos):
-        raise ValueError("Projeto não encontrado.")
+        raise ValueError("Projeto não existe")
     if not any(u.get("Nome","").lower() == responsavel.lower() for u in usuarios):
-        raise ValueError("Responsável não encontrado.")
-    if validar_status(status) is None:
-        raise ValueError("Status inválido.")
-    if parse_date_str(prazo) is None:
-        raise ValueError("Prazo inválido.")
-    tarefas = load_list(TASKS)
-    tarefas.append(nova_tarefa(titulo, projeto, responsavel, status, prazo))
-    save_list(TASKS, tarefas)
+        raise ValueError("Responsável não existe")
+    t = criar_tarefa(titulo, projeto, responsavel, status, prazo)
+    tarefas = listar_tarefas()
+    tarefas.append(t)
+    save_list(TASKS_FILE, tarefas)
+    return t
 
-def buscar_tarefas_por_projeto(projeto: str):
-    return [t for t in load_list(TASKS) if t.get("projeto","").lower() == projeto.lower()]
+def buscar_tarefas_por_projeto(nome):
+    return [t for t in listar_tarefas() if t.get("projeto","").lower() == nome.lower()]
 
-def buscar_tarefas_por_responsavel(resp: str):
-    return [t for t in load_list(TASKS) if t.get("responsavel","").lower() == resp.lower()]
+def buscar_tarefas_por_responsavel(nome):
+    return [t for t in listar_tarefas() if t.get("responsavel","").lower() == nome.lower()]
 
-def buscar_tarefas_por_status(status: str):
-    st = validar_status(status)
-    if st is None:
-        return []
-    return [t for t in load_list(TASKS) if t.get("status","").lower() == st]
+def buscar_tarefas_por_status(status):
+    return [t for t in listar_tarefas() if t.get("status","").lower() == status.lower()]
 
-def atualizar_tarefa(titulo_ref: str, campo: str, valor: str) -> bool:
-    tarefas = load_list(TASKS)
-    updated = False
+def atualizar_tarefa(titulo, campo, valor):
+    tarefas = listar_tarefas()
     for t in tarefas:
-        if t.get("titulo","").lower() == titulo_ref.lower():
-            if campo == "status" and validar_status(valor) is None:
-                raise ValueError("Status inválido.")
-            if campo == "projeto":
-                if not any(p.get("nome","").lower() == valor.lower() for p in load_list(PROJ)):
-                    raise ValueError("Projeto inválido.")
-            if campo == "responsavel":
-                if not any(u.get("Nome","").lower() == valor.lower() for u in load_list(USERS)):
-                    raise ValueError("Responsável inválido.")
-            if campo == "prazo" and parse_date_str(valor) is None:
-                raise ValueError("Prazo inválido.")
+        if t.get("titulo","").lower() == titulo.lower():
             t[campo] = valor
-            updated = True
-            break
-    if updated:
-        save_list(TASKS, tarefas)
-    return updated
+            save_list(TASKS_FILE, tarefas)
+            return True
+    return False
 
-def concluir_tarefa(titulo_ref: str) -> bool:
-    return atualizar_tarefa(titulo_ref, "status", "concluída")
+def concluir_tarefa(titulo):
+    return atualizar_tarefa(titulo, "status", "concluída")
 
-def reabrir_tarefa(titulo_ref: str) -> bool:
-    return atualizar_tarefa(titulo_ref, "status", "pendente")
+def reabrir_tarefa(titulo):
+    return atualizar_tarefa(titulo, "status", "pendente")
 
-def remover_tarefa(titulo_ref: str) -> bool:
-    tarefas = load_list(TASKS)
-    novas = [t for t in tarefas if t.get("titulo","").lower() != titulo_ref.lower()]
-    if len(novas) == len(tarefas):
-        return False
-    save_list(TASKS, novas)
-    return True
+def remover_tarefa(titulo):
+    tarefas = listar_tarefas()
+    nova = [t for t in tarefas if t.get("titulo","").lower() != titulo.lower()]
+    if len(nova) < len(tarefas):
+        save_list(TASKS_FILE, nova)
+        return True
+    return False
 
-def remover_todas_tarefas() -> None:
-    save_list(TASKS, [])
+def remover_todas_tarefas():
+    save_list(TASKS_FILE, [])

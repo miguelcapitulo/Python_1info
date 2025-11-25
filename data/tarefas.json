@@ -3,14 +3,14 @@
         "titulo": "pytthon",
         "projeto": "python",
         "responsavel": "Miguel",
-        "status": "pendente",
+        "status": "concluída",
         "prazo": "27/10/2022"
     },
     {
         "titulo": "c+",
         "projeto": "func_exp",
         "responsavel": "Miguel",
-        "status": "andamento",
+        "status": "concluída",
         "prazo": "08/06/2010"
     },
     {
@@ -19,5 +19,12 @@
         "responsavel": "Migueol",
         "status": "pendente",
         "prazo": "27/10/2022"
+    },
+    {
+        "titulo": "chatoo",
+        "projeto": "Projeto final",
+        "responsavel": "Burnett",
+        "status": "andamento",
+        "prazo": "24/08/2026"
     }
 ]

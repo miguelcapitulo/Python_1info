@@ -1,24 +1,22 @@
-# storage.py
 import json
 import os
-from typing import List, Any
 
 DATA_DIR = "data"
 
-def _path(nome_arquivo: str) -> str:
+def _path(name):
     os.makedirs(DATA_DIR, exist_ok=True)
-    return os.path.join(DATA_DIR, nome_arquivo)
+    return os.path.join(DATA_DIR, name)
 
-def load_list(nome_arquivo: str) -> List[Any]:
-    path = _path(nome_arquivo)
+def load_list(filename):
+    path = _path(filename)
     try:
         with open(path, "r", encoding="utf-8") as f:
-            dados = json.load(f)
-            return dados if isinstance(dados, list) else []
+            data = json.load(f)
+            return data if isinstance(data, list) else []
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
-def save_list(nome_arquivo: str, dados: List[Any]) -> None:
-    path = _path(nome_arquivo)
+def save_list(filename, data):
+    path = _path(filename)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(dados, f, indent=4, ensure_ascii=False)
+        json.dump(data, f, indent=4, ensure_ascii=False)
