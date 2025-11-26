@@ -9,8 +9,10 @@ def pedir_data(msg):
             datetime.strptime(s, "%d/%m/%Y")
             return s
         except ValueError:
-            print("Formato inválido! Digite no formato DD/MM/AAAA.")
-
+            print("Formato inválido! Use exatamente DD/MM/AAAA.")
 
 def validar_status(s):
-    return s.lower().strip() in VALID_STATUS if s else False
+    if not s:
+        return None
+    status_corrigido = s.lower().strip()
+    return status_corrigido if status_corrigido in VALID_STATUS else None

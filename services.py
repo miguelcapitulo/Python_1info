@@ -1,12 +1,13 @@
 from storage import load_list, save_list
 from models import criar_usuario, criar_projeto, criar_tarefa
+from utils import validar_status
 from datetime import datetime
 
 USERS_FILE = "usuarios.json"
 PROJECTS_FILE = "projeto.json"
 TASKS_FILE = "tarefas.json"
 
-#USUÁRIOS
+# USUÁRIOS
 def listar_usuarios():
     return load_list(USERS_FILE)
 
@@ -21,10 +22,7 @@ def cadastrar_usuario(nome, email, perfil):
 
 def buscar_usuarios(term):
     term = term.lower()
-    return [
-        u for u in listar_usuarios()
-        if term in u.get("Nome", "").lower() or term in u.get("Email", "").lower()
-    ]
+    return [u for u in listar_usuarios() if term in u.get("Nome", "").lower() or term in u.get("Email", "").lower()]
 
 def atualizar_usuario(email, campo, valor):
     usuarios = listar_usuarios()
@@ -46,8 +44,8 @@ def remover_usuario(email):
 def remover_todos_usuarios():
     save_list(USERS_FILE, [])
 
-#PROJETOS
 
+# PROJETOS
 def listar_projetos():
     return load_list(PROJECTS_FILE)
 
@@ -61,8 +59,7 @@ def cadastrar_projeto(nome, descricao, ini, fim):
     return p
 
 def buscar_projeto(nome):
-    nome = nome.lower()
-    return [p for p in listar_projetos() if nome in p.get("nome", "").lower()]
+    return [p for p in listar_projetos() if nome.lower() in p.get("nome", "").lower()]
 
 def atualizar_projeto(nome, campo, valor):
     projetos = listar_projetos()
@@ -84,8 +81,8 @@ def remover_projeto(nome):
 def remover_todos_projetos():
     save_list(PROJECTS_FILE, [])
 
-#TAREFAS
 
+# TAREFAS
 def listar_tarefas():
     return load_list(TASKS_FILE)
 
@@ -94,25 +91,26 @@ def cadastrar_tarefa(titulo, projeto, responsavel, status, prazo):
         raise ValueError("O projeto informado não existe.")
     if not any(u.get("Nome", "").lower() == responsavel.lower() for u in listar_usuarios()):
         raise ValueError("O responsável informado não existe.")
+    
+    status = validar_status(status)
+    if not status:
+        raise ValueError("Status inválido. Use pendente, andamento ou concluída.")
+
     t = criar_tarefa(titulo, projeto, responsavel, status, prazo)
     tarefas = listar_tarefas()
     tarefas.append(t)
     save_list(TASKS_FILE, tarefas)
     return t
 
-def buscar_tarefas_por_projeto(nome):
-    return [t for t in listar_tarefas() if t.get("projeto", "").lower() == nome.lower()]
-
-def buscar_tarefas_por_responsavel(nome):
-    return [t for t in listar_tarefas() if t.get("responsavel", "").lower() == nome.lower()]
-
-def buscar_tarefas_por_status(status):
-    return [t for t in listar_tarefas() if t.get("status", "").lower() == status.lower()]
-
 def atualizar_tarefa(titulo, campo, valor):
     tarefas = listar_tarefas()
     for t in tarefas:
         if t.get("titulo", "").lower() == titulo.lower():
+            if campo.lower() == "status":
+                status_validado = validar_status(valor)
+                if not status_validado:
+                    raise ValueError("Status inválido. Use pendente, andamento ou concluída.")
+                valor = status_validado
             t[campo] = valor
             save_list(TASKS_FILE, tarefas)
             return True
@@ -135,51 +133,44 @@ def remover_tarefa(titulo):
 def remover_todas_tarefas():
     save_list(TASKS_FILE, [])
 
-#RELATÓRIOS
 
+# RELATÓRIOS
 def tarefas_atrasadas():
     hoje = datetime.now().date()
-    return [
-        t for t in listar_tarefas()
-        if datetime.strptime(t.get("prazo"), "%d/%m/%Y").date() < hoje
-        and t.get("status") != "concluída"
-    ]
+    atrasadas = []
+    for t in listar_tarefas():
+        try:
+            prazo = datetime.strptime(t.get("prazo"), "%d/%m/%Y").date()
+            status = t.get("status", "").lower()
+            if prazo < hoje and status in ("pendente", "andamento"):
+                atrasadas.append(t)
+        except Exception:
+            continue
+    return atrasadas
 
 def report_summary_by_project():
     projetos = listar_projetos()
     tarefas = listar_tarefas()
-    if not projetos:
-        return []
-
     relatorio = []
     for p in projetos:
         nome = p.get("nome")
         tarefas_proj = [t for t in tarefas if t.get("projeto") == nome]
         total = len(tarefas_proj)
-
         por_status = {}
         for t in tarefas_proj:
-            status = t.get("status")
-            por_status[status] = por_status.get(status, 0) + 1
-
-        pct_concluidas = 0
-        if total > 0:
-            concluidas = por_status.get("concluída", 0)
-            pct_concluidas = (concluidas / total) * 100
-
+            por_status[t.get("status")] = por_status.get(t.get("status"), 0) + 1
+        pct_concluidas = (por_status.get("concluída", 0) / total) * 100 if total > 0 else 0
         relatorio.append({
             "projeto": nome,
             "total": total,
             "por_status": por_status,
             "pct_concluidas": pct_concluidas
         })
-
     return relatorio
 
 def productivity_by_user(inicio, fim):
     inicio = datetime.strptime(inicio, "%d/%m/%Y").date()
     fim = datetime.strptime(fim, "%d/%m/%Y").date()
-
     produtividades = {}
     for t in listar_tarefas():
         if t.get("status") == "concluída":
@@ -187,7 +178,6 @@ def productivity_by_user(inicio, fim):
             if inicio <= prazo <= fim:
                 resp = t.get("responsavel")
                 produtividades[resp] = produtividades.get(resp, 0) + 1
-
     return produtividades
 
 def overdue_tasks():

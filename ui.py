@@ -1,293 +1,275 @@
+# ui.py
 import services
 from utils import pedir_data, validar_status
 
-#USUÁRIOS
 def menu_usuarios():
     while True:
-        print("\nMENU DE USUÁRIOS")
-        print("[1] Cadastrar novo usuário")
-        print("[2] Listar todos os usuários")
-        print("[3] Buscar usuário por nome ou e-mail")
-        print("[4] Atualizar dados de usuário")
-        print("[5] Remover usuário")
-        print("[6] Remover todos os usuários")
-        print("[0] Voltar ao menu anterior")
-
-        op = input("Escolha uma opção: ").strip()
+        print("\n=== USUÁRIOS ===")
+        print("[1] Cadastrar")
+        print("[2] Listar")
+        print("[3] Buscar")
+        print("[4] Atualizar")
+        print("[5] Remover")
+        print("[6] Remover TODOS")
+        print("[0] Voltar")
+        op = input("Escolha: ").strip()
         try:
             if op == "1":
-                nome = input("Informe o nome do usuário: ").strip()
-                email = input("Informe o e-mail: ").strip()
-                perfil = input("Informe o perfil (adm/comum): ").strip()
+                nome = input("Nome: ").strip()
+                email = input("Email: ").strip()
+                perfil = input("Perfil: ").strip()
                 services.cadastrar_usuario(nome, email, perfil)
                 print("Usuário cadastrado com sucesso.")
             elif op == "2":
                 usuarios = services.listar_usuarios()
                 if not usuarios:
-                    print("Nenhum usuário cadastrado.")
-                for u in usuarios:
-                    print(f"Nome: {u.get('Nome')} | Email: {u.get('Email')} | Perfil: {u.get('Perfil')}")
-
+                    print("Não há usuários cadastrados.")
+                else:
+                    for i, u in enumerate(usuarios, 1):
+                        print(f"{i}. {u.get('Nome')} | {u.get('Email')} | {u.get('Perfil')}")
             elif op == "3":
-                termo = input("Digite um nome ou e-mail para buscar: ").strip()
+                termo = input("Digite nome ou email para busca: ").strip()
                 encontrados = services.buscar_usuarios(termo)
                 if not encontrados:
                     print("Nenhum usuário encontrado.")
-                for u in encontrados:
-                    print(f"Nome: {u.get('Nome')} | Email: {u.get('Email')} | Perfil: {u.get('Perfil')}")
-
+                else:
+                    for u in encontrados:
+                        print(f"- {u.get('Nome')} | {u.get('Email')} | {u.get('Perfil')}")
             elif op == "4":
-                email = input("Informe o e-mail do usuário a ser atualizado: ").strip()
-                print("[1] Nome | [2] Email | [3] Perfil")
-                campo = {"1": "Nome", "2": "Email", "3": "Perfil"}.get(input("Escolha o campo: ").strip())
+                email = input("Email do usuário a atualizar: ").strip()
+                print("[1] Nome [2] Email [3] Perfil")
+                esc = input("Escolha campo: ").strip()
+                campo = {"1": "Nome", "2": "Email", "3": "Perfil"}.get(esc)
                 if campo:
-                    valor = input("Informe o novo valor: ").strip()
-                    services.atualizar_usuario(email, campo, valor)
-                    print("Dados atualizados.")
-
+                    valor = input("Novo valor: ").strip()
+                    updated = services.atualizar_usuario(email, campo, valor)
+                    print("Atualizado." if updated else "Usuário não encontrado.")
+                else:
+                    print("Opção inválida.")
             elif op == "5":
-                email = input("Informe o e-mail do usuário a ser removido: ").strip()
-                services.remover_usuario(email)
-                print("Usuário removido.")
-
+                email = input("Email para remover: ").strip()
+                removed = services.remover_usuario(email)
+                print("Removido." if removed else "Usuário não encontrado.")
             elif op == "6":
-                if input("Tem certeza que deseja remover TODOS os usuários? (s/n): ").lower() == "s":
+                if input("Tem certeza que deseja remover todos os usuários? (s/n): ").strip().lower() == "s":
                     services.remover_todos_usuarios()
                     print("Todos os usuários foram removidos.")
-
             elif op == "0":
                 break
-            
             else:
                 print("Opção inválida.")
-
         except Exception as e:
             print("Erro:", e)
 
-#PROJETOS
 def menu_projetos():
     while True:
-        print("\nMENU DE PROJETOS")
-        print("[1] Cadastrar projeto")
-        print("[2] Listar projetos")
-        print("[3] Buscar projeto")
-        print("[4] Atualizar projeto")
-        print("[5] Remover projeto")
-        print("[6] Remover todos os projetos")
-        print("[0] Voltar ao menu anterior")
-
-        op = input("Escolha uma opção: ").strip()
+        print("\n=== PROJETOS ===")
+        print("[1] Cadastrar")
+        print("[2] Listar")
+        print("[3] Buscar")
+        print("[4] Atualizar")
+        print("[5] Remover")
+        print("[6] Remover TODOS")
+        print("[0] Voltar")
+        op = input("Escolha: ").strip()
         try:
             if op == "1":
-                nome = input("Informe o nome do projeto: ")
-                descricao = input("Informe uma breve descrição: ")
-                ini = pedir_data("Informe a data de início (DD/MM/AAAA): ")
-                fim = pedir_data("Informe a data de término (DD/MM/AAAA): ")
+                nome = input("Nome do projeto: ").strip()
+                descricao = input("Descrição: ").strip()
+                ini = pedir_data("Data início (DD/MM/AAAA): ")
+                fim = pedir_data("Data fim (DD/MM/AAAA): ")
                 services.cadastrar_projeto(nome, descricao, ini, fim)
                 print("Projeto cadastrado com sucesso.")
-
             elif op == "2":
                 projetos = services.listar_projetos()
                 if not projetos:
-                    print("Nenhum projeto cadastrado.")
-                for p in projetos:
-                    print(f"Nome: {p.get('nome')} | Descrição: {p.get('descricao')} | "
-                          f"Período: {p.get('data_inicio')} até {p.get('data_fim')}")
-
+                    print("Não há projetos cadastrados.")
+                else:
+                    for p in projetos:
+                        print(f"- {p.get('nome')} | {p.get('descricao')} | {p.get('data_inicio')} → {p.get('data_fim')}")
             elif op == "3":
-                nome = input("Digite o nome do projeto para buscar: ").strip()
+                nome = input("Nome do projeto para buscar: ").strip()
                 encontrados = services.buscar_projeto(nome)
                 if not encontrados:
-                    print("Nenhum projeto encontrado.")
-                for p in encontrados:
-                    print(f"Nome: {p.get('nome')} | Descrição: {p.get('descricao')}")
-
+                    print("Projeto não encontrado.")
+                else:
+                    for p in encontrados:
+                        print(f"- {p.get('nome')} | {p.get('descricao')}")
             elif op == "4":
-                nome = input("Informe o nome do projeto a ser atualizado: ")
-                print("[1] Nome | [2] Descrição | [3] Datas")
-                escolha = input("Escolha o campo a ser atualizado: ")
-
-                if escolha == "1":
-                    services.atualizar_projeto(nome, "nome", input("Novo nome: "))
-                elif escolha == "2":
-                    services.atualizar_projeto(nome, "descricao", input("Nova descrição: "))
-                elif escolha == "3":
-                    ini = pedir_data("Nova data de início: ")
-                    fim = pedir_data("Nova data de término: ")
+                nome = input("Nome do projeto a atualizar: ").strip()
+                print("[1] Nome [2] Descrição [3] Datas")
+                esc = input("Escolha: ").strip()
+                if esc == "1":
+                    novo = input("Novo nome: ").strip()
+                    services.atualizar_projeto(nome, "nome", novo)
+                elif esc == "2":
+                    nova = input("Nova descrição: ").strip()
+                    services.atualizar_projeto(nome, "descricao", nova)
+                elif esc == "3":
+                    ini = pedir_data("Nova data início (DD/MM/AAAA): ")
+                    fim = pedir_data("Nova data fim (DD/MM/AAAA): ")
                     services.atualizar_projeto(nome, "data_inicio", ini)
                     services.atualizar_projeto(nome, "data_fim", fim)
-                print("Projeto atualizado.")
-
+                else:
+                    print("Opção inválida.")
             elif op == "5":
-                services.remover_projeto(input("Informe o nome do projeto a ser removido: "))
-                print("Projeto removido.")
-
+                nome = input("Nome do projeto a remover: ").strip()
+                removed = services.remover_projeto(nome)
+                print("Removido." if removed else "Projeto não encontrado.")
             elif op == "6":
-                if input("Tem certeza que deseja remover TODOS os projetos? (s/n): ").lower() == "s":
+                if input("Tem certeza que deseja remover todos os projetos? (s/n): ").strip().lower() == "s":
                     services.remover_todos_projetos()
                     print("Todos os projetos foram removidos.")
-
             elif op == "0":
                 break
-
             else:
                 print("Opção inválida.")
-
         except Exception as e:
             print("Erro:", e)
 
-#TAREFAS
 def menu_tarefas():
     while True:
-        print("\nMENU DE TAREFAS")
-        print("[1] Cadastrar tarefa")
-        print("[2] Listar todas as tarefas")
+        print("\n=== TAREFAS ===")
+        print("[1] Cadastrar")
+        print("[2] Listar todas")
         print("[3] Listar por projeto")
         print("[4] Listar por responsável")
         print("[5] Listar por status")
-        print("[6] Atualizar tarefa")
-        print("[7] Marcar como concluída")
-        print("[8] Reabrir tarefa")
-        print("[9] Remover tarefa")
-        print("[10] Remover todas as tarefas")
-        print("[0] Voltar ao menu anterior")
-
-        op = input("Escolha uma opção: ").strip()
+        print("[6] Atualizar")
+        print("[7] Concluir")
+        print("[8] Reabrir")
+        print("[9] Remover")
+        print("[10] Remover TODAS")
+        print("[0] Voltar")
+        op = input("Escolha: ").strip()
         try:
             if op == "1":
-                titulo = input("Título da tarefa: ")
-                projeto = input("Nome do projeto: ")
-                responsavel = input("Nome do responsável: ")
+                titulo = input("Título: ").strip()
+                projeto = input("Projeto (nome): ").strip()
+                responsavel = input("Responsável (nome): ").strip()
                 while True:
-                    status = input("Status (pendente, andamento, concluída): ").lower()
+                    status = input("Status (pendente/andamento/concluída): ").strip().lower()
                     if validar_status(status):
                         break
-                    print("Status inválido. Tente novamente.")
+                    print("Status inválido. Use pendente, andamento ou concluída.")
                 prazo = pedir_data("Prazo (DD/MM/AAAA): ")
                 services.cadastrar_tarefa(titulo, projeto, responsavel, status, prazo)
                 print("Tarefa cadastrada com sucesso.")
-
             elif op == "2":
                 tarefas = services.listar_tarefas()
                 if not tarefas:
-                    print("Nenhuma tarefa cadastrada.")
-                for t in tarefas:
-                    print(f"{t.get('titulo')} | Projeto: {t.get('projeto')} | "
-                          f"Responsável: {t.get('responsavel')} | Status: {t.get('status')} | "
-                          f"Prazo: {t.get('prazo')}")
-
+                    print("Não há tarefas cadastradas.")
+                else:
+                    for i, t in enumerate(tarefas, 1):
+                        print(f"{i}. {t.get('titulo')} | Projeto: {t.get('projeto')} | Responsável: {t.get('responsavel')} | Status: {t.get('status')} | Prazo: {t.get('prazo')}")
             elif op == "3":
-                projeto = input("Nome do projeto: ")
-                for t in services.buscar_tarefas_por_projeto(projeto):
-                    print(f"{t.get('titulo')} | Responsável: {t.get('responsavel')}")
-
+                proj = input("Nome do projeto: ").strip()
+                res = services.buscar_tarefas_por_projeto(proj)
+                for t in res:
+                    print(f"- {t.get('titulo')} | Responsável: {t.get('responsavel')} | Status: {t.get('status')} | Prazo: {t.get('prazo')}")
             elif op == "4":
-                resp = input("Nome do responsável: ")
-                for t in services.buscar_tarefas_por_responsavel(resp):
-                    print(f"{t.get('titulo')} | Projeto: {t.get('projeto')}")
-
+                resp = input("Nome do responsável: ").strip()
+                res = services.buscar_tarefas_por_responsavel(resp)
+                for t in res:
+                    print(f"- {t.get('titulo')} | Projeto: {t.get('projeto')} | Status: {t.get('status')} | Prazo: {t.get('prazo')}")
             elif op == "5":
-                status = input("Informe o status: ")
-                for t in services.buscar_tarefas_por_status(status):
-                    print(f"{t.get('titulo')} | Projeto: {t.get('projeto')}")
-
+                st = input("Status (pendente/andamento/concluída): ").strip().lower()
+                res = services.buscar_tarefas_por_status(st)
+                for t in res:
+                    print(f"- {t.get('titulo')} | Projeto: {t.get('projeto')} | Responsável: {t.get('responsavel')} | Prazo: {t.get('prazo')}")
             elif op == "6":
-                titulo = input("Título da tarefa a ser atualizada: ")
-                print("[1] Título | [2] Projeto | [3] Responsável | [4] Status | [5] Prazo")
-                campo = {"1": "titulo", "2": "projeto", "3": "responsavel", "4": "status", "5": "prazo"} \
-                    .get(input("Escolha o campo: "))
+                titulo = input("Título para atualizar: ").strip()
+                print("[1] Título [2] Projeto [3] Responsável [4] Status [5] Prazo")
+                esc = input("Escolha: ").strip()
+                campo_map = {"1": "titulo", "2": "projeto", "3": "responsavel", "4": "status", "5": "prazo"}
+                campo = campo_map.get(esc)
                 if campo:
-                    valor = pedir_data("Novo prazo: ") if campo == "prazo" else input("Novo valor: ")
+                    if campo == "prazo":
+                        valor = pedir_data("Novo prazo (DD/MM/AAAA): ")
+                    else:
+                        valor = input("Novo valor: ").strip()
                     services.atualizar_tarefa(titulo, campo, valor)
-                    print("Tarefa atualizada.")
-
+                    print("Atualização aplicada (se a tarefa existe).")
+                else:
+                    print("Opção inválida.")
             elif op == "7":
-                services.concluir_tarefa(input("Título da tarefa: "))
-                print("Tarefa marcada como concluída.")
-
+                titulo = input("Título para concluir: ").strip()
+                ok = services.concluir_tarefa(titulo)
+                print("Tarefa marcada como concluída." if ok else "Tarefa não encontrada.")
             elif op == "8":
-                services.reabrir_tarefa(input("Título da tarefa: "))
-                print("Tarefa reaberta.")
-
+                titulo = input("Título para reabrir: ").strip()
+                ok = services.reabrir_tarefa(titulo)
+                print("Tarefa reaberta (pendente)." if ok else "Tarefa não encontrada.")
             elif op == "9":
-                services.remover_tarefa(input("Título da tarefa: "))
-                print("Tarefa removida.")
-
+                titulo = input("Título para remover: ").strip()
+                ok = services.remover_tarefa(titulo)
+                print("Removida." if ok else "Tarefa não encontrada.")
             elif op == "10":
-                if input("Tem certeza que deseja remover TODAS as tarefas? (s/n): ").lower() == "s":
+                if input("Tem certeza que deseja remover todas as tarefas? (s/n): ").strip().lower() == "s":
                     services.remover_todas_tarefas()
                     print("Todas as tarefas foram removidas.")
-
             elif op == "0":
                 break
-
             else:
                 print("Opção inválida.")
-
         except Exception as e:
             print("Erro:", e)
 
-#RELATÓRIOS
 def menu_relatorios():
     while True:
-        print("\n=== MENU DE RELATÓRIOS ===")
-        print("[1] Resumo por projeto")
-        print("[2] Produtividade por usuário")
-        print("[3] Tarefas atrasadas")
-        print("[0] Voltar ao menu anterior")
-
-        op = input("Escolha uma opção: ").strip()
+        print("\n=== RELATÓRIOS ===")
+        print("[1] Resumo por projeto (total / por status / % concluídas)")
+        print("[2] Produtividade por usuário (tarefas concluídas no período)")
+        print("[3] Atrasos (tarefas com prazo vencido e status pendente/andamento)")
+        print("[0] Voltar")
+        op = input("Escolha: ").strip()
         try:
             if op == "1":
-                relatorios = services.report_summary_by_project()
-                if not relatorios:
-                    print("Nenhum projeto encontrado ou sem tarefas cadastradas.")
-                for r in relatorios:
-                    print(f"\nProjeto: {r['projeto']}")
-                    print(f"Total de tarefas: {r['total']}")
-                    for s, c in r['por_status'].items():
-                        print(f"  - {s}: {c}")
-                    print(f"Percentual de concluídas: {r['pct_concluidas']:.1f}%")
-
+                resumo = services.report_summary_by_project()
+                if not resumo:
+                    print("Não há dados para exibir.")
+                else:
+                    for r in resumo:
+                        print(f"\nProjeto: {r['projeto']}")
+                        print(f"  Total de tarefas: {r['total']}")
+                        print("  Tarefas por status:")
+                        for s, c in r['por_status'].items():
+                            print(f"    - {s}: {c}")
+                        print(f"  Percentual concluídas: {r['pct_concluidas']:.1f}%")
             elif op == "2":
-                inicio = pedir_data("Informe a data de início (DD/MM/AAAA): ")
-                fim = pedir_data("Informe a data de término (DD/MM/AAAA): ")
-                produtividades = services.productivity_by_user(inicio, fim)
-                if not produtividades:
-                    print("Nenhuma tarefa concluída no período informado.")
-                for usuario, total in produtividades.items():
-                    print(f"{usuario}: {total} tarefa(s) concluída(s)")
-
+                inicio = pedir_data("Data início (DD/MM/AAAA): ")
+                fim = pedir_data("Data fim (DD/MM/AAAA): ")
+                prod = services.productivity_by_user(inicio, fim)
+                if not prod:
+                    print("Nenhuma tarefa concluída nesse período.")
+                else:
+                    print("Produtividade por usuário (tarefas concluídas no período):")
+                    for user, count in prod.items():
+                        print(f"- {user}: {count} tarefa(s) concluída(s)")
             elif op == "3":
-                atrasadas = services.overdue_tasks()
-                if not atrasadas:
-                    print("Nenhuma tarefa atrasada encontrada.")
-                for t in atrasadas:
-                    print(f"{t.get('titulo')} | Projeto: {t.get('projeto')} | "
-                          f"Responsável: {t.get('responsavel')} | Prazo: {t.get('prazo')} | "
-                          f"Status: {t.get('status')}")
-
+                atrasos = services.overdue_tasks()
+                if not atrasos:
+                    print("Nenhuma tarefa atrasada (prazo vencido e status pendente/andamento).")
+                else:
+                    print("Tarefas atrasadas (prazo vencido e status pendente/andamento):")
+                    for t in atrasos:
+                        print(f"- {t.get('titulo')} | Projeto: {t.get('projeto')} | Responsável: {t.get('responsavel')} | Prazo: {t.get('prazo')} | Status: {t.get('status')}")
             elif op == "0":
                 break
-
             else:
                 print("Opção inválida.")
-
         except Exception as e:
             print("Erro:", e)
 
-#MENU PRINCIPAL
 def menu_main():
     while True:
-        print("\nSISTEMA DE GERENCIAMENTO")
+        print("\n===== SISTEMA =====")
         print("[1] Usuários")
         print("[2] Projetos")
         print("[3] Tarefas")
         print("[4] Relatórios")
         print("[0] Sair")
-
-        op = input("Escolha uma opção: ").strip()
-
+        op = input("Escolha: ").strip()
         if op == "1":
             menu_usuarios()
         elif op == "2":
@@ -297,7 +279,7 @@ def menu_main():
         elif op == "4":
             menu_relatorios()
         elif op == "0":
-            print("Encerrando sistema.")
             break
         else:
             print("Opção inválida.")
+

@@ -1,37 +1,30 @@
 [
     {
-        "titulo": "pytthon",
-        "projeto": "python",
-        "responsavel": "Miguel",
-        "status": "concluída",
-        "prazo": "27/10/2022"
-    },
-    {
-        "titulo": "c+",
-        "projeto": "func_exp",
-        "responsavel": "Miguel",
-        "status": "concluída",
-        "prazo": "08/06/2010"
-    },
-    {
-        "titulo": "burnet",
-        "projeto": "burnout",
-        "responsavel": "Migueol",
-        "status": "pendente",
-        "prazo": "27/10/2022"
-    },
-    {
         "titulo": "chatoo",
-        "projeto": "Projeto final",
-        "responsavel": "Burnett",
-        "status": "andamento",
-        "prazo": "24/08/2026"
+        "projeto": "matematica",
+        "responsavel": "Miguel",
+        "status": "pendente",
+        "prazo": "23/08/2000"
     },
     {
-        "titulo": "chuto",
+        "titulo": "1",
         "projeto": "Projeto final",
         "responsavel": "Burnett",
-        "status": "concluída",
-        "prazo": "24/08/2028"
+        "status": "pendente",
+        "prazo": "24/01/2000"
+    },
+    {
+        "titulo": "teste2",
+        "projeto": "matematica",
+        "responsavel": "miguel",
+        "status": "pendente",
+        "prazo": "28/04/2010"
+    },
+    {
+        "titulo": "teste1",
+        "projeto": "matematica",
+        "responsavel": "Miguel",
+        "status": "andamento",
+        "prazo": "28/04/2020"
     }
 ]
