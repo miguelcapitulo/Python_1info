@@ -9,7 +9,6 @@ TASKS_FILE = "tarefas.json"
 VALID_STATUS = ("pendente", "andamento", "concluída")
 
 #USUÁRIOS
-
 def listar_usuarios():
     return load_list(USERS_FILE)
 
