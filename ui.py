@@ -1,4 +1,3 @@
-# ui.py
 import services
 from utils import pedir_data, validar_status
 
@@ -197,10 +196,20 @@ def menu_tarefas():
                 if not campo:
                     print("Opção inválida.")
                 else:
-                    if campo == "prazo":
+                    if campo == "titulo":
+                        valor = input("Novo título: ").strip()
+                    elif campo == "projeto":
+                        valor = input("Novo projeto: ").strip()
+                    elif campo == "responsavel":
+                        valor = input("Novo responsável: ").strip()
+                    elif campo == "status":
+                        while True:
+                            valor = input("Novo status (pendente / andamento / concluída): ").strip().lower()
+                            if validar_status(valor):
+                                break
+                            print("Status inválido. Use pendente, andamento ou concluída.")
+                    elif campo == "prazo":
                         valor = pedir_data("Novo prazo (DD/MM/AAAA): ")
-                    else:
-                        valor = input("Novo valor: ").strip()
                     services.atualizar_tarefa(titulo, campo, valor)
                     print("Tarefa atualizada (se existia).")
             elif op == "7":

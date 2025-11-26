@@ -19,8 +19,6 @@ def criar_projeto(nome, descricao, data_inicio, data_fim):
 def criar_tarefa(titulo, projeto, responsavel, status, prazo):
     if status.lower() not in VALID_STATUS:
         raise ValueError("Status inválido")
-   
-   # valida prazo
     try:
         from datetime import datetime as _dt
         _dt.strptime(prazo, "%d/%m/%Y")

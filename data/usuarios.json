@@ -5,8 +5,13 @@
         "Perfil": "info"
     },
     {
-        "Nome": "miguel",
+        "Nome": "davi",
         "Email": "miguel@gmail.com",
-        "Perfil": "67"
+        "Perfil": "41"
+    },
+    {
+        "Nome": "pedro",
+        "Email": "pedro@gmail.com",
+        "Perfil": "adm"
     }
 ]

@@ -1,4 +1,3 @@
-# services.py
 from storage import load_list, save_list
 from models import criar_usuario, criar_projeto, criar_tarefa
 from datetime import datetime
@@ -9,7 +8,7 @@ TASKS_FILE = "tarefas.json"
 
 VALID_STATUS = ("pendente", "andamento", "concluída")
 
-# ------------------ USUÁRIOS ------------------
+#USUÁRIOS
 
 def listar_usuarios():
     return load_list(USERS_FILE)
@@ -53,8 +52,7 @@ def remover_todos_usuarios():
     save_list(USERS_FILE, [])
 
 
-# ------------------ PROJETOS ------------------
-
+#PROJETOS
 def listar_projetos():
     return load_list(PROJECTS_FILE)
 
@@ -62,7 +60,6 @@ def cadastrar_projeto(nome, descricao, ini, fim):
     projetos = listar_projetos()
     if any(p.get("nome", "").lower() == nome.lower() for p in projetos):
         raise ValueError("Já existe um projeto com esse nome.")
-    # validação simples de datas
     try:
         d_ini = datetime.strptime(ini, "%d/%m/%Y").date()
         d_fim = datetime.strptime(fim, "%d/%m/%Y").date()
@@ -102,8 +99,7 @@ def remover_todos_projetos():
     save_list(PROJECTS_FILE, [])
 
 
-# ------------------ TAREFAS ------------------
-
+#TAREFAS
 def listar_tarefas():
     return load_list(TASKS_FILE)
 
@@ -111,19 +107,15 @@ def _normalize_status(status):
     if not status:
         return None
     s = status.strip().lower()
-    # aceita variações comuns? não — exige exatas permitidas
     if s in VALID_STATUS:
         return s
     return None
 
 def cadastrar_tarefa(titulo, projeto, responsavel, status, prazo):
-    # valida projeto
     if not any(p.get("nome", "").lower() == projeto.lower() for p in listar_projetos()):
         raise ValueError("O projeto informado não existe.")
-    # valida responsavel
     if not any(u.get("Nome", "").lower() == responsavel.lower() for u in listar_usuarios()):
         raise ValueError("O responsável informado não existe.")
-    # valida status e prazo
     status_norm = _normalize_status(status)
     if not status_norm:
         raise ValueError("Status inválido. Use: pendente, andamento ou concluída.")
@@ -165,7 +157,6 @@ def atualizar_tarefa(titulo, campo, valor):
                     raise ValueError("Status inválido. Use: pendente, andamento ou concluída.")
                 t["status"] = status_norm
             elif campo.lower() == "prazo":
-                # valida formato de data
                 try:
                     datetime.strptime(valor, "%d/%m/%Y")
                 except Exception:
@@ -195,8 +186,7 @@ def remover_todas_tarefas():
     save_list(TASKS_FILE, [])
 
 
-# ------------------ RELATÓRIOS ------------------
-
+#RELATÓRIOS
 def tarefas_atrasadas():
     hoje = datetime.now().date()
     atrasadas = []
@@ -207,7 +197,6 @@ def tarefas_atrasadas():
             prazo = datetime.strptime(prazo_str, "%d/%m/%Y").date()
         except Exception:
             continue
-        # aqui consideramos atrasadas somente se prazo já passou e status for pendente ou andamento
         if prazo < hoje and status in ("pendente", "andamento"):
             atrasadas.append(t)
     return atrasadas
